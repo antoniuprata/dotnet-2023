@@ -110,36 +110,30 @@ public struct GeoFeature : BaseShape
         IsPolygon = feature.Type == GeometryType.Polygon;
         var naturalKey = feature.Properties.FirstOrDefault(x => x.Key == "natural").Value;
         Type = GeoFeatureType.Unknown;
+
         if (naturalKey != null)
         {
-            if (naturalKey == "fell" ||
-                naturalKey == "grassland" ||
-                naturalKey == "heath" ||
-                naturalKey == "moor" ||
-                naturalKey == "scrub" ||
-                naturalKey == "wetland")
+            var typeMappings = new Dictionary<string, GeoFeatureType>
+        {
+            { "fell", GeoFeatureType.Plain },
+            { "grassland", GeoFeatureType.Plain },
+            { "heath", GeoFeatureType.Plain },
+            { "moor", GeoFeatureType.Plain },
+            { "scrub", GeoFeatureType.Plain },
+            { "wetland", GeoFeatureType.Plain },
+            { "wood", GeoFeatureType.Forest },
+            { "tree_row", GeoFeatureType.Forest },
+            { "bare_rock", GeoFeatureType.Mountains },
+            { "rock", GeoFeatureType.Mountains },
+            { "scree", GeoFeatureType.Mountains },
+            { "beach", GeoFeatureType.Desert },
+            { "sand", GeoFeatureType.Desert },
+            { "water", GeoFeatureType.Water }
+        };
+
+            if (typeMappings.TryGetValue(naturalKey, out var mappedType))
             {
-                Type = GeoFeatureType.Plain;
-            }
-            else if (naturalKey == "wood" ||
-                     naturalKey == "tree_row")
-            {
-                Type = GeoFeatureType.Forest;
-            }
-            else if (naturalKey == "bare_rock" ||
-                     naturalKey == "rock" ||
-                     naturalKey == "scree")
-            {
-                Type = GeoFeatureType.Mountains;
-            }
-            else if (naturalKey == "beach" ||
-                     naturalKey == "sand")
-            {
-                Type = GeoFeatureType.Desert;
-            }
-            else if (naturalKey == "water")
-            {
-                Type = GeoFeatureType.Water;
+                Type = mappedType;
             }
         }
 
@@ -148,6 +142,7 @@ public struct GeoFeature : BaseShape
             ScreenCoordinates[i] = new PointF((float)MercatorProjection.lonToX(c[i].Longitude),
                 (float)MercatorProjection.latToY(c[i].Latitude));
     }
+
 }
 
 public struct Railway : BaseShape
